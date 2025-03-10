@@ -221,9 +221,9 @@ For simple continuous or indicator parameters of the phylogenetic model (like su
 
 The space of phylogenetic trees presents a significantly greater challenge. The sheer number of possible rooted trees explodes super-exponentially with increasing taxa, making it highly unlikely that the MCMC samples contain the true tree topology \cite{ccd}. The \emph{curse of dimensionality} \cite{curse} diminishes the effectiveness of common sample-based statistical methods, particularly distance-based approaches. We demonstrate in the Supplementary Information that MCMC samples can exhibit strikingly similar pairwise distances, contradicting the expectation that regions of higher probability density should yield samples with closer proximity. Furthermore, the space of possible node times is non-Euclidean, as the times are inherently constrained by the topology \cite{wald,tauspace,tropical,bhv}. These challenges make it difficult to directly analyze the posterior sample of trees and branch lengths. One strategy to extract meaningful information from the sample involves dedicated post-processing techniques. The raw sample is distilled into representations that enable a more meaningful analysis and interpretation.
 
-A common approach is to infer a point estimate, a single "best" tree that summarizes the posterior sample \cite{treesinforest}. Several heuristics have been developed for this purpose, including DensiTree visualizations \cite{densitree}, Maximum Clade Credibility (MCC) trees, Hipster \cite{hipstr}, and the Maximum A Posteriori tree based on Conditional Clade Distributions (CCD) \cite{ccd,ccdlarget}. These methods often focusing primarily on recovering a likely tree topology. The determination of branch lengths is treated as an afterthought, potentially overlooking important information about evolutionary timescales.
+A common approach is to infer a point estimate, a single "best" tree that summarizes the posterior sample \cite{treesinforest}. Several heuristics have been developed for this purpose, including DensiTree visualizations \cite{densitree}, Maximum Clade Credibility (MCC) trees, Hipster \cite{hipstr}, and the Maximum A Posteriori tree based on Conditional Clade Distributions (CCD) \cite{ccd,ccdlarget}. These methods often focus primarily on recovering a likely tree topology. The determination of branch lengths is treated as an afterthought, potentially overlooking important information about evolutionary timescales.
 
-Another class of algorithms considers both tree topology and branch lengths simultaneously by embedding trees in a defined metric space. Examples include the Billera-Holmes-Vogtmann (BHV) space \cite{bhv}, the Wald space \cite{wald}, the $t$ and $\tau$ space \cite{tauspace}, the palm tree space \cite{tropical}, the RNNI space \cite{rnnispace}, and the recently developed Wald space \cite{wald}. Within these spaces, a natural approach to obtaining a point estimate is to calculate the Fréchet mean of the posterior tree sample \cite{frechetmeanvar}. However, these spaces often suffer from limitations such as the "sticky mean" problem (where the mean tree is almost independent of the actual tree samples) \cite{sticky}, high computational complexity associated with distance calculations, and the inherent difficulties of performing statistical inference in complex geometric spaces \cite{riemanngaussian}.
+Another class of algorithms considers both tree topology and branch lengths simultaneously by embedding trees in a particular metric space. Examples include the Billera-Holmes-Vogtmann (BHV) space \cite{bhv}, the Wald space \cite{wald}, the $t$ and $\tau$ space \cite{tauspace}, the palm tree space \cite{tropical}, the RNNI space \cite{rnnispace}, and the recently developed Wald space \cite{wald}. Within these spaces, a natural approach to obtain a point estimate is to calculate the Fréchet mean of the posterior tree sample \cite{frechetmeanvar}. However, these spaces often suffer from limitations such as the \emph{sticky mean problem} (where the mean tree is almost independent of the actual tree samples) \cite{sticky}, high computational complexity associated with distance calculations, and the inherent difficulties of performing statistical inference in complex geometric spaces \cite{riemanngaussian}.
 
 While obtaining a point estimate from the posterior sample is crucial, it is important to recognize that the MCMC sample embodies information about the entire posterior distribution. Tractable tree distributions \cite{ccd} aim to capture the posterior distribution using a well-defined approximate distribution. This provides an elegant framework for testing alternative evolutionary hypotheses, determining whether a specific tree falls within a credible set, calculating statistics like information content \cite{informationcontent}, and analyzing dependencies between different parts of the tree (e.g., relationships between branch lengths and topological features). Existing methods that estimate distributions on the posterior sample for rooted trees focus on modeling tree topologies \cite{ccd,ccdlarget}, ignoring time information entirely. The family of Bayesian subsplit networks \cite{subsplit} has been extended to model branch lengths in multiple ways \cite{subsplitnf,subsplitbranchlengths}. However, Bayesian subsplit methods focus on direct variational inference, rather than posterior sample summarization.
 
@@ -231,7 +231,7 @@ This paper addresses the challenge of inferring tractable distributions on time 
 
 \section*{Materials and methods}
 
-In this section, we introduce the concept of tractable tree distributions on time trees and discuss desirable properties of such distributions. We then introduce a family of distributions satisfying these properties and show how to estimate the parameters based on a tree sample. Furthermore, we describe how these distributions lead to a point estimator. Finally, we outline the procedure used to assess and compare the distributions on both synthetic and real datasets.
+In this section, we introduce the concept of tractable tree distributions on time trees and discuss desirable properties of such distributions. We then introduce a family of distributions satisfying these properties and show how to perform common operations such as parameter estimation and obtaining a point estimate. Finally, we outline the procedure used to assess and compare the distributions on both synthetic and real datasets.
 
 \subsection*{Tractable tree distributions}
 
@@ -241,7 +241,7 @@ Tractable time tree distributions are used as a tool to analyze a posterior tree
 
 \subsection*{Mathematical framework}
 
-A \emph{time tree} $(T, \{H_v\}_{v \in V})$ for a set of taxa $X$ and root $R$ consists of a tree $T = (V, E)$ and a set of random variables $\{H_v\}_{v \in V} \in \mathbb{R}^+$ denoting the vertex heights. The following properties have to be satisfied:
+A \emph{time tree} $(T, \{H_v\}_{v \in V})$ for a set of taxa $X$ and root $R$ consists of a undirected tree $T = (V, E)$ and a set of random variables $\{H_v\}_{v \in V} \in \mathbb{R}^+$ denoting the vertex heights (the divergence times). The following properties have to be satisfied:
 
 \begin{enumerate}
 	\item $(V, E)$ describe a fully connected tree.
@@ -253,40 +253,40 @@ A \emph{time tree} $(T, \{H_v\}_{v \in V})$ for a set of taxa $X$ and root $R$ c
 The probability of a time tree can be factorized into the probability of its topology $T$ and the probability of the vertex heights $\{H_v\}$ given the topology:
 
 $$
-\Pro{(T, \{H_v\})} = \Pro{T} \Pro{\{H_v\} | T}.
+\Pro{T, \{H_v\}_{v \in V}} = \Pro{T} \Pro{\{H_v\}_{v \in V} | T}.
 $$
 
-To model $\Pro{T}$, we use the conditional clade distributions \emph{CCD0} and \emph{CCD1} \cite{ccd,ccdlarget}. They already exhibit the desired properties and have shown to work well in practice \cite{ccd,ccd0expansion,hipstr}. Thus, we focus on modelling the conditional probability $\Pro{\{H_v\} | T}$. It is crucial to note that we do not restrict ourselves to a single topology $T$---we simply model $\Pro{\{H_v\} | T}$ as a function of the topology $T$.
+To model $\Pro{T}$, we use the conditional clade distributions \emph{CCD0} and \emph{CCD1} \cite{ccd,ccdlarget}. They already exhibit the desired properties and have shown to work well in practice \cite{ccd,ccd0expansion,hipstr}. Thus, we focus on modelling the conditional probability $\Pro{\{H_v\}_{v \in V} | T}$. It is crucial to note that we do not restrict ourselves to a single topology $T$---we simply model $\Pro{\{H_v\}_{v \in V} | T}$ as a function of the topology $T$.
 
 \subsection*{Clade parameterisation}
 
 There are two main challenges when designing a distribution on the heights:
 
-First, $P\left(\{H_v\} | T\right)$ is a function of the topology $T$. However, we cannot assume that every possible topology is found in the MCMC sample. Hence, $P\left(\{H_v\} | T\right)$ needs to be defined even for unknown topologies. Moreover, as the number of possible topologies can be extremly large, we have to share parameters amongst different topologies. In order to overcome this challenge, we employ the same strategy as the CCD0 model \cite{ccd}: instead of having random variables corresponding to vertices of a topology, they correspond to clades:
+First, $P\left(\{H_v\}_{v \in V} | T\right)$ is a function of the topology $T$. However, we cannot assume that every possible topology is found in the MCMC sample. Hence, $P\left(\{H_v\}_{v \in V} | T\right)$ needs to be defined even for unknown topologies. Moreover, as the number of possible topologies can be extremly large, we have to share parameters amongst different topologies. In order to overcome this challenge, we employ the same strategy as the CCD0 model \cite{ccd}: instead of having random variables corresponding to vertices of a topology, they correspond to clades:
 
 $$
-\Pro{\{H_v\} | T} = \Pro{\{H_c\}_{c \in C(T)} | T},
+\Pro{\{H_v\}_{v \in V} | T} = \Pro{\{H_c\}_{c \in C(T)} | T},
 $$
 
-where $C(T)$ is the set of clades in topology $T$. A clade is a subset of taxa that share a common ancestor. While every vertex corresponds to exactly one clade, modeling random variables on a clade-level allows to share parameters amongst different topologies that have common clades. We call a clade \emph{non-trivial} if it is neither a singleton nor the root clade. In the following, we exclude the singleton clades corresponding to the taxa from $C(T)$. $H_c$ equals $0$ for all singleton clades and does not need to be modelled. 
+where $C(T)$ is the set of clades in topology $T$. A clade is a subset of taxa that share a common ancestor. While every vertex corresponds to exactly one clade, modeling random variables on a clade-level allows to share parameters amongst different topologies that have common clades. We call a clade \emph{non-trivial} if it is neither a singleton nor the root clade. In the following, we exclude the singleton clades corresponding to the taxa from $C(T)$, as $H_c$ equals $0$ for all singleton clades and does not need to be modelled. 
 
-Another difficulty is the fact that every topology enforces a different set of constraints on the heights. We expect $P\left(\{H_c\} | T\right)$ to vanish for heights invalid under the topology. We solve this by introducing the concept of a \emph{clade embedding}. Given a topology $T$, a clade embedding $f_T$ induces a bijection from the heights into another set of random variables in the \emph{embedding space}:
+Another difficulty is the fact that every topology enforces a different set of constraints on the heights. We expect $P\left(\{H_c\}_{c \in C(T)} | T\right)$ to vanish for heights invalid under the topology. We solve this by introducing the concept of a \emph{clade embedding}. Given a topology $T$, a clade embedding $f_T$ induces a bijection from the heights into another set of random variables in the \emph{embedding space}:
 
 $$
 f_T: \{H_c\}_{c \in C(T)} \mapsto \{Z_c\}_{c \in C(T)}.
 $$
 
-The embedding can be chosen such that the $Z_c$ have nice constraints independent of the topology (for instance, $Z_c \in \mathbb{R}$ or $Z_c \in [0, 1]$). Equipped with an embedding, we can define a probability distribution on $\{Z_c\}$ as well as the corresponding pulled-back probability distribution on $\{H_c\}$:
+The embedding can be chosen such that the $Z_c$ have nice constraints independent of the topology (for instance, $Z_c \in \mathbb{R}$ or $Z_c \in [0, 1]$). Equipped with an embedding, we can define a probability distribution on $\{Z_c\}_{c \in C(T)}$ as well as the corresponding pulled-back probability distribution on $\{H_c\}_{c \in C(T)}$:
 
 $$
-P\left(\{H_c\} | T\right) = P\left(\{Z_c\} | T\right) \left| \det{\left(J_{f_t^{-1}}(\{Z_c\})\right)} \right|,
+P\left(\{H_c\}_{c \in C(T)} | T\right) = P\left(\{Z_c\}_{c \in C(T)} | T\right) \left| \det{\left(J_{f_t^{-1}}(\{Z_c\}_{c \in C(T)})\right)} \right|,
 $$
 
-where $J_{f_t^{-1}}(\{Z_c\})$ is the Jacobian of the inverse of the embedding.
+where $J_{f_t^{-1}}(\{Z_c\}_{c \in C(T)})$ is the Jacobian of the inverse of the embedding.
 
 In order to get the probability of a set of heights under a topology, we first transform the set of heights into the embedding space. Then, we can use the pulled-back probability distribution to calculate the probability. If we want to sample from the distribution, we can sample from the embedding space and transform the samples back into the original height space.
 
-In the following sections, we introduce three different clade embeddings as well as different strategies for assigning probabilities in the embedding space. Our general approach is to find the best approximation of the marginal time tree posterior distribution of the MCMC model. Thus, biological interpretation of the designed distributions is not a primary goal. Instead, we focus on a wide range of embeddings and distributions that fulfill the properties of tractable time tree distributions and then compare their fit with the MCMC posterior distribution of a variety of real and simulated datasets.
+In the following sections, we introduce three different clade embeddings equipped with different strategies for assigning probabilities in the embedding space. Our general approach is to find the best approximation of the marginal time tree posterior distribution of the MCMC model. Thus, biological interpretation of the designed distributions is not a primary goal. Instead, we focus on a wide range of embeddings and distributions that fulfill the properties of tractable time tree distributions and then compare their fit with the MCMC posterior distribution on a variety of real and simulated datasets.
 
 \subsection*{Last divergence embedding}
 

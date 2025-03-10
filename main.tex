@@ -235,7 +235,7 @@ In this section, we introduce the concept of tractable tree distributions on tim
 
 \subsection*{Tractable tree distributions}
 
-Berling et al. \cite{ccd} introduced \emph{tractable tree distributions} as a set of properties of a distribution on tree topologies. A distribution is tractable if the a range of operations can be performed efficiently in practice. We apply the same concept to distributions on \emph{time trees}.
+Berling et al. \cite{ccd} introduced \emph{tractable tree distributions} as a set of properties of a distribution on tree topologies. A distribution is tractable if a range of operations can be performed efficiently in practice. We apply the same concept to distributions on \emph{time trees}.
 
 Tractable time tree distributions are used as a tool to analyze a posterior tree sample. Therefore, we should be able to efficiently infer its parameters based on that tree sample. In order to compare different tree hypotheses, we need to evaluate the probability of any time tree under the model. Another important operation is sampling, as it enables to test if a tree is in the 95\% credible set and to inspect the dependencies of different node heights. Lastly, a tractable time tree distribution should provide us with a \emph{summary tree}, for instance by retrieving the highest-probability or expected tree.
 
@@ -368,7 +368,7 @@ $$
 P(Z_X) = \text{Lognormal}(Z_X; \mu_X, \sigma_X).
 $$
 
-\subsection*{Common operations}
+\subsection*{Operations on tractable time tree distributions}
 
 We use the maximum likelihood estimator to estimate the parameters for each embedding and the corresponding distributions. The stated independence assumptions significantly simplify this process, reducing it to the maximum likelihood estimation of basic univariate continuous distributions. For the lognormal and logitnormal distribution, the maximum likelihood estimators exhibit well-known closed form solutions. For the gamma, beta and weibull distributions, we apply Newton's method as implemented in the julia package \emph{Distributions.jl} \cite{Distributions.jl}. The maximum likelihood estimator for the TreeDirichlet distribution is more involved and is detailed in the supporting information.
 
@@ -388,7 +388,7 @@ Moreover, we use probability–probability plots for a visual inspection of the 
 
 \subsection*{Datasets}
 
-We conduct a comprehensive comparison of different distributions using both simulated and real datasets. For the simulated datasets, we analyze posterior samples from the CCD study \cite{ccd}, focusing on the Yule tree simulations with 10, 20, 50, 100, 200, and 400 taxa. These samples were generated using LPhyStudio, LPhyBEAST \cite{linguaphylo}, and BEAST2 \cite{beast2}.
+We conduct a comprehensive comparison of different distributions using both simulated and real datasets. For the simulated datasets, we analyze posterior samples from the CCD study \cite{ccddata}, focusing on the Yule tree simulations with 10, 20, 50, 100, 200, and 400 taxa. These samples were generated using LPhyStudio, LPhyBEAST \cite{linguaphylo}, and BEAST2 \cite{beast2}.
 
 To assess the performance on biological datasets, we obtained 99 posterior time tree distributions from Dryad \cite{dryad}. Specifically, we filtered the database for files with a \emph{.trees} extension and manually selected those containing posterior sample trees obtained by BEAST2 or a similar software. An exhaustive list of the studies considered and potential reasons for exclusion are provided in the supporting information.
 

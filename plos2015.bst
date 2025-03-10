@@ -20,13 +20,13 @@
 %%
 %%-------------------------------------------------------------------
 %%
-%% Copyright 2004  Folkert van der Beek
+%% Copyright 2004 Folkert van der Beek
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
 %% of this license or (at your option) any later version.
 %% The latest version of this license is in
-%%   http://www.latex-project.org/lppl.txt
+%%  http://www.latex-project.org/lppl.txt
 %% and version 1.3 or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 %%
@@ -44,13 +44,13 @@
 %% This is a numerical citation style, and as such is standard LaTeX.
 %% It requires no extra package to interface to the main text.
 %% The form of the \bibitem entries is
-%%   \bibitem{key}...
+%%  \bibitem{key}...
 %% Usage of \cite is as follows:
-%%   \cite{key} ==>>          [#]
-%%   \cite[chap. 2]{key} ==>> [#, chap. 2]
+%%  \cite{key} ==>>     [#]
+%%  \cite[chap. 2]{key} ==>> [#, chap. 2]
 %% where # is a number determined by the ordering in the reference list.
 %% The order in the reference list is that by which the works were originally
-%%   cited in the text, or that in the database.
+%%  cited in the text, or that in the database.
  %
 %% To change the reference numbering system from [1] to 1,
 %% put the following code in the preamble:
@@ -62,42 +62,42 @@
 
 %% List of all possible fields
 ENTRY
-  { address
-    assignee     % for patents
-    author
-    booktitle    % for articles in books
-    chapter      % for incollection, esp. internet documents
-    cartographer % for maps
-    day
-    edition
-    editor
-    howpublished
-    institution  % for technical reports
-    inventor     % for patents
-    journal
-    key
-    month
-    note
-    number
-    organization
-    pages
-    part
-    publisher
-    school
-    series
-    title
-    type
-    volume
-    word
-    year
-    eprint % urlbst
-    doi % urlbst
-    url % urlbst
-    lastchecked % urlbst
-    updated % urlbst
-  }
-  {}
-  { label }
+ { address
+  assignee   % for patents
+  author
+  booktitle  % for articles in books
+  chapter   % for incollection, esp. internet documents
+  cartographer % for maps
+  day
+  edition
+  editor
+  howpublished
+  institution % for technical reports
+  inventor   % for patents
+  journal
+  key
+  month
+  note
+  number
+  organization
+  pages
+  part
+  publisher
+  school
+  series
+  title
+  type
+  volume
+  word
+  year
+  eprint % urlbst
+  doi % urlbst
+  url % urlbst
+  lastchecked % urlbst
+  updated % urlbst
+ }
+ {}
+ { label }
 %% Declaration of integer variables
 INTEGERS { output.state before.all mid.sentence after.sentence after.block }
 STRINGS { urlintro doiprefix } % urlbst...
@@ -105,30 +105,30 @@ INTEGERS { hrefform addeprints adddoiresolver }
 % Following constants may be adjusted by hand, if desired
 FUNCTION {init.config.constants}
 {
-  "Available from: " 'urlintro := % prefix before URL
-  "doi:" 'doiprefix := % text prefix printed before DOI ref
-  #0 'addeprints := % 0=no eprints; 1=include eprints
-  #0 'adddoiresolver := % 0=no DOI resolver; 1=include it
-  #0 'hrefform := % 0=no crossrefs; 1=hypertex xrefs; 2=hyperref refs
+ "Available from: " 'urlintro := % prefix before URL
+ "doi:" 'doiprefix := % text prefix printed before DOI ref
+ #0 'addeprints := % 0=no eprints; 1=include eprints
+ #0 'adddoiresolver := % 0=no DOI resolver; 1=include it
+ #0 'hrefform := % 0=no crossrefs; 1=hypertex xrefs; 2=hyperref refs
 }
 INTEGERS { 
-  bracket.state
-  outside.brackets
-  open.brackets
-  within.brackets
-  close.brackets
+ bracket.state
+ outside.brackets
+ open.brackets
+ within.brackets
+ close.brackets
 }
 % ...urlbst to here
 FUNCTION {init.state.consts}
 { #0 'outside.brackets := % urlbst
-  #1 'open.brackets :=
-  #2 'within.brackets :=
-  #3 'close.brackets :=
+ #1 'open.brackets :=
+ #2 'within.brackets :=
+ #3 'close.brackets :=
 
-  #0 'before.all :=
-  #1 'mid.sentence :=
-  #2 'after.sentence :=
-  #3 'after.block :=
+ #0 'before.all :=
+ #1 'mid.sentence :=
+ #2 'after.sentence :=
+ #3 'after.block :=
 }
 %% Declaration of string variables
 STRINGS { s t}
@@ -136,224 +136,224 @@ STRINGS { s t}
 % urlbst
 FUNCTION {output.nonnull.original}
 { 's :=
-  output.state mid.sentence =
-    { ". " * write$ }
-    { output.state after.block =
-        { add.period$ write$
-          newline$
-          "\newblock " write$
-        }
-        { output.state before.all =
-            'write$
-            { add.period$ " " * write$ }
-          if$
-        }
-      if$
-      mid.sentence 'output.state :=
+ output.state mid.sentence =
+  { ". " * write$ }
+  { output.state after.block =
+    { add.period$ write$
+     newline$
+     "\newblock " write$
     }
-  if$
-  s
+    { output.state before.all =
+      'write$
+      { add.period$ " " * write$ }
+     if$
+    }
+   if$
+   mid.sentence 'output.state :=
+  }
+ if$
+ s
 }
 
 % urlbst...
 FUNCTION {output.nonnull}
 { % Save the thing we've been asked to output
-  's :=
-  % If the bracket-state is close.brackets, then add a close-bracket to
-  % what is currently at the top of the stack, and set bracket.state
-  % to outside.brackets
-  bracket.state close.brackets =
-    { "]" *
-      outside.brackets 'bracket.state :=
-    }
-    'skip$
-  if$
-  bracket.state outside.brackets =
-    { % We're outside all brackets -- this is the normal situation.
-      % Write out what's currently at the top of the stack, using the
-      % original output.nonnull function.
-      s
-      output.nonnull.original
-    }
-    { % Still in brackets.  Add open-bracket or (continuation) comma, add the
-      % new text (in s) to the top of the stack, and move to the close-brackets
-      % state, ready for next time (unless inbrackets resets it).  If we come
-      % into this branch, then output.state is carefully undisturbed.
-      bracket.state open.brackets =
-        { " [" * }
-        { ", " * } % bracket.state will be within.brackets
-      if$ 
-      s * 
-      close.brackets 'bracket.state :=
-    }
-  if$
+ 's :=
+ % If the bracket-state is close.brackets, then add a close-bracket to
+ % what is currently at the top of the stack, and set bracket.state
+ % to outside.brackets
+ bracket.state close.brackets =
+  { "]" *
+   outside.brackets 'bracket.state :=
+  }
+  'skip$
+ if$
+ bracket.state outside.brackets =
+  { % We're outside all brackets -- this is the normal situation.
+   % Write out what's currently at the top of the stack, using the
+   % original output.nonnull function.
+   s
+   output.nonnull.original
+  }
+  { % Still in brackets. Add open-bracket or (continuation) comma, add the
+   % new text (in s) to the top of the stack, and move to the close-brackets
+   % state, ready for next time (unless inbrackets resets it). If we come
+   % into this branch, then output.state is carefully undisturbed.
+   bracket.state open.brackets =
+    { " [" * }
+    { ", " * } % bracket.state will be within.brackets
+   if$ 
+   s * 
+   close.brackets 'bracket.state :=
+  }
+ if$
 }
 
 % Call this function just before adding something which should be presented in 
-% brackets.  bracket.state is handled specially within output.nonnull.
+% brackets. bracket.state is handled specially within output.nonnull.
 FUNCTION {inbrackets}
 { bracket.state close.brackets =
-    { within.brackets 'bracket.state := } % reset the state: not open nor closed
-    { open.brackets 'bracket.state := }
-  if$
+  { within.brackets 'bracket.state := } % reset the state: not open nor closed
+  { open.brackets 'bracket.state := }
+ if$
 }
 
 FUNCTION {format.lastchecked}
 { lastchecked empty$
-    { "" }
-    { updated empty$
-      { inbrackets "cited " lastchecked * }
-      { inbrackets "updated " updated * "; cited " * lastchecked * }
-    if$
-    }
+  { "" }
+  { updated empty$
+   { inbrackets "cited " lastchecked * }
+   { inbrackets "updated " updated * "; cited " * lastchecked * }
   if$
+  }
+ if$
 }
 % ...urlbst to here
 
 FUNCTION {output}
 { duplicate$ empty$
-    'pop$
-    'output.nonnull
-  if$
+  'pop$
+  'output.nonnull
+ if$
 }
 
 FUNCTION {output.check}
 { 't :=
-  duplicate$ empty$
-    { pop$ "empty " t * " in " * cite$ * warning$ }
-    'output.nonnull
-  if$
+ duplicate$ empty$
+  { pop$ "empty " t * " in " * cite$ * warning$ }
+  'output.nonnull
+ if$
 }
 
 FUNCTION {fin.entry}
 { 
-  bracket.state close.brackets = % urlbst
-    { "]" * }
-    'skip$
-  if$
-   add.period$
-  write$
-  newline$
+ bracket.state close.brackets = % urlbst
+  { "]" * }
+  'skip$
+ if$
+  add.period$
+ write$
+ newline$
 }
 
 FUNCTION {new.block}
 { output.state before.all =
-    'skip$
-    { after.block 'output.state := }
-  if$
+  'skip$
+  { after.block 'output.state := }
+ if$
 }
 
 FUNCTION {new.sentence}
 { output.state after.block =
+  'skip$
+  { output.state before.all =
     'skip$
-    { output.state before.all =
-        'skip$
-        { after.sentence 'output.state := }
-      if$
-    }
-  if$
+    { after.sentence 'output.state := }
+   if$
+  }
+ if$
 }
 
 FUNCTION {add.blank}
-{  " " * before.all 'output.state :=
+{ " " * before.all 'output.state :=
 }
 
 FUNCTION {no.blank.or.punct}
-{  "" * before.all 'output.state :=
+{ "" * before.all 'output.state :=
 }
 
 FUNCTION {add.semicolon}
 {
-  ";" *
-  no.blank.or.punct
+ ";" *
+ no.blank.or.punct
 }
 
 FUNCTION {date.block}
 {
-  "." *
-  no.blank.or.punct
+ "." *
+ no.blank.or.punct
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%            LOGICAL `NOT', `AND', AND `OR'                 %
+%      LOGICAL `NOT', `AND', AND `OR'         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Logical 'not':
 % If the first element on the stack is A then this function
 % does the following:
-%     push { #0 }
-%     push { #1 }
+%   push { #0 }
+%   push { #1 }
 % So now the first 3 elements of the stack are
-%     { #1 } { #0 } A
+%   { #1 } { #0 } A
 % The first 3 are popped and subjected to 'if':
 % If A > 0 then { #0 } is executed, else { #1 } is executed:
-%     if A > 0
-%     then 0
-%     else 1
+%   if A > 0
+%   then 0
+%   else 1
 % So consider integers as logicals, where 1 = true and 0 = false,
 % then this does
-%     (if A then false else true)
+%   (if A then false else true)
 % which is a logical 'not'.
 
 FUNCTION {not}
-{   { #0 }
-    { #1 }
-  if$
+{  { #0 }
+  { #1 }
+ if$
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Logical 'and':
 % If the first 2 elements on the stack are A B
 % then this function does the following:
-%     push 'skip$
-%     push { pop$ #0 }
+%   push 'skip$
+%   push { pop$ #0 }
 % So now first 4 elements are
-%     { pop$ #0 } 'skip$ A B
+%   { pop$ #0 } 'skip$ A B
 % The first 3 are popped and subjected to 'if' (B is on top of
 % the stack):
 % If A > 0 then 'skip$ is executed, else { pop$ #0 } is executed:
-%     if A > 0
-%     then (B stays on top of stack)
-%     else (B is popped and #0 is pushed)
+%   if A > 0
+%   then (B stays on top of stack)
+%   else (B is popped and #0 is pushed)
 % So consider integers as logicals, where 1 = true and 0 = false,
 % then this does
-%     (if A then B else false)
+%   (if A then B else false)
 % which is a logical 'and'.
 
 FUNCTION {and}
-{   'skip$
-    { pop$ #0 }
-  if$
+{  'skip$
+  { pop$ #0 }
+ if$
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Logical 'or':
 % If the first 2 elements on the stack are A B
 % then this function does the following:
-%     push { pop$ #1 }
-%     push 'skip$
+%   push { pop$ #1 }
+%   push 'skip$
 % So now first 4 elements are
-%     'skip$ { pop$ #1 } A B
+%   'skip$ { pop$ #1 } A B
 % The first 3 are popped and subjected to 'if' (B is on top of
 % the stack):
 % If A > 0 then { pop$ #1 } is executed, else 'skip$ is executed:
-%     if A > 0
-%     then (B is popped and #1 is pushed)
-%     else (B stays on top of stack)
+%   if A > 0
+%   then (B is popped and #1 is pushed)
+%   else (B stays on top of stack)
 % So consider integers as logicals, where 1 = true and 0 = false,
 % then this does
-%     (if A then true else B)
+%   (if A then true else B)
 % which is a logical 'or'.
 
 FUNCTION {or}
-{   { pop$ #1 }
-    'skip$
-  if$
+{  { pop$ #1 }
+  'skip$
+ if$
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  GENERAL PURPOSE FUNCTIONS FOR FORMATTING                 %
+% GENERAL PURPOSE FUNCTIONS FOR FORMATTING             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

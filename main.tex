@@ -304,7 +304,7 @@ $$
 Z_X = \min_{x \in X}{H_x}.
 $$
 
-This embedding allows to choose arbitrary positive $Z_c$ while always producing a valid tree. Thus, we propose to use either independent lognormal, independent gamma distributions, or independent Weibull distributions:
+This embedding allows to choose arbitrary positive $Z_c$ while always producing a valid tree. Thus, we propose to use either independent lognormal, independent gamma, or independent Weibull distributions:
 
 $$
 P(\{Z_c\}_{c \in C(T)}) = \begin{cases}
@@ -314,7 +314,7 @@ P(\{Z_c\}_{c \in C(T)}) = \begin{cases}
 \end{cases}
 $$
 
-Different models for divergence suggest different distributions on the branch lengths \cite{venditti2010phylogenies}. For instance, a constant rate of divergence will result in an exponential distribution, which is a special case of the gamma distribution. If the rate of divergence changes with the amount of time since the last divergence, the resulting distribution is a Weibull distribution.
+Different models for divergence suggest different distributions on the branch lengths \cite{venditti2010phylogenies}. For instance, a constant rate of divergence results in an exponential distribution, which is a special case of the gamma distribution. If the rate of divergence changes with the amount of time since the last divergence, the resulting distribution might be closer to a Weibull distribution.
 
 \subsection*{Oldest child embedding}
 
@@ -362,10 +362,10 @@ $$
 
 The $TreeDirichlet$ distribution is a generalized Dirichlet distribution, parameterized by a single parameter for each non-trivial clade. It is a special case of the independent beta distributions, defined such that the marginal distribution of any path from the root vertex to a leaf follows a Dirichlet distribution. A formal definition is provided in the supporting information.
 
-For the overall tree height, we employ a lognormal distribution:
+We model the overall tree height with a lognormal distribution:
 
 $$
-P(Z_X) = \text{Lognormal}(Z_X; \mu_X, \sigma_X).
+P(Z_X) = \text{LogNormal}(Z_X; \mu_X, \sigma_X).
 $$
 
 \subsection*{Operations on tractable time tree distributions}
@@ -374,7 +374,9 @@ We use the maximum likelihood estimator to estimate the parameters for each embe
 
 In order to calculate the probability for a given time tree, we first transform the set of heights into the embedding space. Then, we can use the pulled-back probability distribution to calculate the probability.
 
-Sampling from the distribution is achieved by drawing samples from the embedding space and mapping them back to the original height space using the inverse transformation. To assess if a given time tree is within the 95 \% credible set, we can generate a large number of samples from the fitted distribution. If the model probability of the given tree ranks within the top 95 \% of the sampled tree probabilities, it is in the credible set."
+Sampling from the distribution is achieved by drawing samples from the embedding space and mapping them back to the original height space using the inverse transformation. To assess if a given time tree is within the 95 \% credible set, we can generate a large number of samples from the fitted distribution. If the model probability of the given tree ranks within the top 95 \% of the sampled tree probabilities, it is in the credible set.
+
+TODO: point estimator
 
 \subsection*{Validation}
 
@@ -382,13 +384,13 @@ To evaluate the quality of our proposed tractable time tree distributions, we us
 
 Given a posterior set of time trees, we calculate the Akaike Information Criterion (AIC) to compare the relative performance of our distributions on a given set of time trees. AIC balances model likelihood with parameter count, providing a ranking of models. However, it does not determine if any model accurately reflects the posterior distribution.
 
-We perform a goodness-of-fit test to assess how well our tractable tree distributions capture the true distribution. We frame this as a two-sample hypothesis test, where we compare the MCMC time trees with a set of time trees sampled from our approximate distribution. Standard two sample GoF tests do not work on time trees due to their high-dimensional, continuous nature and the lack of a natural order. To overcome this, we transform the trees into a univariate continuous space. Specifically, we calculate the probability of each tree under the fitted model, transforming it into the space $[0, 1]$. We then employ a two-sample Anderson-Darling test on the set of probabilities of the two samples to determine if they are drawn from the same distribution. It is important to acknowledge that this does not definitively prove the equality of the time tree distributions. Distinct tree distributions could, in theory, produce similar distributions of probabilities. However, it does provide a necessary condition for the distributions to be identical.
+We perform a goodness-of-fit test to assess how well our tractable tree distributions capture the true distribution. We frame this as a two-sample hypothesis test, where we compare the MCMC time trees with a set of time trees sampled from our approximate distribution. Standard two sample GoF tests do not work in the space of time trees due to its high-dimensional, continuous nature and the lack of a natural order. To overcome this, we transform the trees into a univariate continuous space. Specifically, we calculate the probability of each tree under the fitted model, transforming it into the space $[0, 1]$. We then employ a two-sample Anderson-Darling test on the set of probabilities of the two samples to determine if they are drawn from the same distribution. It is important to acknowledge that this does not prove the equality of the time tree distributions: Distinct tree distributions could, in theory, produce similar distributions of probabilities. However, it does provide a necessary condition for the distributions to be identical.
 
 Moreover, we use probability–probability plots for a visual inspection of the goodness of fit. They work by plotting the empirical cumulative distribution function (ECDF) of the two probability-transformed samples against each other. If the approximate distribution closely resembles the posterior distribution, the resulting plot should be close to a straight line.
 
 \subsection*{Datasets}
 
-We conduct a comprehensive comparison of different distributions using both simulated and real datasets. For the simulated datasets, we analyze posterior samples from the CCD study \cite{ccddata}, focusing on the Yule tree simulations with 10, 20, 50, 100, 200, and 400 taxa. These samples were generated using LPhyStudio, LPhyBEAST \cite{linguaphylo}, and BEAST2 \cite{beast2}.
+We conduct a comprehensive comparison of different distributions using both simulated and real datasets. For the simulated datasets, we analyze posterior samples from the CCD study \cite{ccddata}, focusing on the Yule tree simulations with 10, 20, 50, 100, 200, and 400 taxa. These samples were generated using LPhyStudio, LPhyBEAST \cite{linguaphylo}, and BEAST2 \cite{beast2}. We refer to the CCD paper \cite{ccd} for more details on the simulations.
 
 To assess the performance on biological datasets, we obtained 99 posterior time tree distributions from Dryad \cite{dryad}. Specifically, we filtered the database for files with a \emph{.trees} extension and manually selected those containing posterior sample trees obtained by BEAST2 or a similar software. An exhaustive list of the studies considered and potential reasons for exclusion are provided in the supporting information.
 

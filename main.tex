@@ -502,16 +502,16 @@ Note that this is a modified version of the \emph{Squared Branch Score} \cite{tr
 
 We conduct a comprehensive comparison of different distributions using both simulated and real datasets. For the simulated datasets, we used LPhyBEAST \cite{linguaphylo} to generate 100 trees corresponding sequence alignments under the Yule process with 100, 200 and 400 taxa respectively. Afterwards, we performed MCMC inference with BEAST 2 \cite{beast2} on each of the obtained 300 sequence alignments. We refer to the Supplementary Information for more details on the simulations.
 
-To assess the performance on biological datasets, we obtained 44 posterior time tree distributions from Dryad \cite{dryad}. Specifically, we filtered the database for files with a \emph{.trees} extension and manually selected those containing a posterior sample of ultrametric time trees obtained using BEAST 2 or a similar software. An exhaustive list of the studies considered and potential reasons for exclusion are provided in the supporting information (see also table \ref{table-bio-datasets}). The datasets are part of a growing collection of phylogenetic posterior trees \cite{tree_dataset} curated to enable better method validation.
+To assess the performance on real-world datasets, we obtained 44 posterior time tree distributions from Dryad \cite{dryad}. Specifically, we filtered the database for files with a \emph{.trees} extension and manually selected those containing a posterior sample of ultrametric time trees obtained using BEAST 2 or a similar software. An exhaustive list of the studies considered and potential reasons for exclusion are provided in the supporting information (see also table \ref{table-bio-datasets}). The datasets are part of a growing collection of phylogenetic posterior trees \cite{tree_dataset} curated to enable better method validation.
 
 \begin{table}[h!]
-	\caption{Some statistics on the biological datasets used in this study. The datasets were obtained from Dryad \cite{dryad} by filtering for files with a \emph{.trees} extension and manually selecting those containing a posterior sample of ultrametric time trees obtained by BEAST 2 or a similar software.}
+	\caption{Some statistics on the real-world datasets used in this study. The datasets were obtained from Dryad \cite{dryad} by filtering for files with a \emph{.trees} extension and manually selecting those containing a posterior sample of ultrametric time trees obtained by BEAST 2 or a similar software.}
 	\label{table-bio-datasets}
 
 	\centering
 	\begin{tabular}{@{}ll@{}}
 		\toprule
-		\multicolumn{2}{c}{Summary of the biological datasets} \\
+		\multicolumn{2}{c}{Summary of the real-world datasets} \\
 		\midrule
 		Number of datasets	& 56 \\
 		Number of datasets on plants & 24 \\
@@ -593,6 +593,107 @@ Figure \ref{fig:data-likelihood} shows the distribution of the log data likeliho
 
 \subsection*{Goodness-of-fit}
 
+In order to assess the goodness-of-fit, we first look at the Cramér-von Mises criterion of the credible region plots. The smaller the criterion, the smaller the deviation to the $x=y$ line in the credible region plots. The smaller the deviation, the better the approximate distribution captures the smallest $\gamma$-credible regions for different values of $\gamma$. Figure \ref{fig:cramer-von-mises} shows the Cramér-von Mises criterion for the different distributions and datasets, while figure \ref{fig:cramer-von-mises-ranking} shows how often a specific method ranks at a certain position compared to the other methods. Interestingly, the ranking observed for the data likelihood is also apparant to some extent in the ranking of the Cramér-von Mises criterion for the real-world datasets. There, the height ratio embeddings generally perform best, while the shortest branch embedding and the last divergence embedding show no clear tendency. On the other hand, the Cramér-von Mises criterion for the simulated Yule datasets tell a different story, with the height ratio embedding generally showing the highest deviation to the $x=y$ line.
+
+\begin{figure}[h!]
+	\caption{The Cramér-von Mises criterion for the different distributions and datasets. (The lower the better.)}
+	
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-100-ccd1-cvm.png}
+		\subcaption{Yule-100}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-cvm.png}
+		\subcaption{Yule-200}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-400-ccd1-cvm.png}
+		\subcaption{Yule-400}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/bio-ccd1-cvm.png}
+		\subcaption{Real-world datasets}
+	\end{subfigure}
+	
+	\label{fig:cramer-von-mises}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{This figure shows how often a specific method ranks at a certain position when its Cramér-von Mises criterion is compared to the other methods. For example, the height ratio embedding with the beta distribution ranked first for almost all datasets. (The lower the rank the better.)}
+	
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-100-ccd1-cvm-ranking.png}
+		\subcaption{Yule-100}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-cvm-ranking.png}
+		\subcaption{Yule-200}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-400-ccd1-cvm-ranking.png}
+		\subcaption{Yule-400}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/bio-ccd1-cvm-ranking.png}
+		\subcaption{Real-world datasets}
+	\end{subfigure}
+	
+	\label{fig:cramer-von-mises-ranking}
+\end{figure}
+
+Figure \ref{fig:credible-regions} shows a selection of credible-regions plots for some datasets and distributions. Plots for all datasets and distributions can be found in the Supporting Information. The larger divergence for some datasets can partly be attributed to large entropy and a small sample size, particularily for tge real-world datasets. Whenever a clade split only appears in the validation samples but not in the training samples, the corresponding CCD1 probability of a tree with this clade will be $0$. These trees with probability $0$ are only contained in the smallest 100\%-credible region, leading to a smaller fraction than expected for all other credible regions. For some biological datasets, every single tree in the validation sample has probability $0$.
+
+\begin{figure}[h!]
+	\caption{This figure shows the credible-region plots for different datasets and distributions. The plot shows the fraction of MCMC trees contained in the smallest $\gamma$-credible region for different $\gamma$. The closer the resulting line is to the $x=y$ line the better. The blue line shows the median line for the datasets; 95 \% of all datasets fall into the blue region. The grey lines the credible region plots for 10 random datasets.}
+	
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-credible-sets-Height (LogNormal), Ratios (Beta).png}
+		\subcaption{Height (LogNormal), Ratios (Beta) on Yule-200}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-credible-sets-Shortest Branch (Gamma).png}
+		\subcaption{Shortest Branch (Gamma) on Yule-200}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-credible-sets-Last Divergence (Gamma), Branches (Gamma).png}
+		\subcaption{Last Divergence (Gamma), Branches (Gamma) on Yule-200}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/bio-ccd1-credible-sets-Height (LogNormal), Ratios (Beta).png}
+		\subcaption{Height (LogNormal), Ratios (Beta) on real-world datasets}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/bio-ccd1-credible-sets-Shortest Branch (Gamma).png}
+		\subcaption{Shortest Branch (Gamma) on real-world datasets}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/bio-ccd1-credible-sets-Last Divergence (Gamma), Branches (Gamma).png}
+		\subcaption{Last Divergence (Gamma), Branches (Gamma) on real-world datasets}
+	\end{subfigure}
+	
+	\label{fig:credible-regions}
+\end{figure}
 
 
 \subsection*{Accuracy of the point estimators}

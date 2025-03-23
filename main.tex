@@ -110,6 +110,7 @@
 % package for drawing trees
 \usepackage{forest}
 
+\usepackage{float}
 \usepackage{subcaption}
 
 % create "+" rule type for thick vertical lines
@@ -234,7 +235,7 @@ A common approach is to infer a point estimate, a single "best" tree that summar
 
 Another class of algorithms simultaneously considers tree topology and branch lengths by embedding trees in a particular metric space. Examples include the Billera-Holmes-Vogtmann (BHV) space \cite{bhv}, the Wald space \cite{wald}, the $t$ and $\tau$ space \cite{tauspace}, the palm tree space \cite{tropical}, the RNNI space \cite{rnnispace}, and the recently developed Wald space \cite{wald}. Within these spaces, a natural approach to obtain a point estimate is to calculate the Fréchet mean of the posterior tree sample \cite{frechetmeanvar}. However, these spaces often suffer from limitations such as the \emph{sticky mean problem} (where the mean tree is almost independent of the actual tree samples) \cite{sticky}, high computational complexity associated with distance calculations, and the inherent difficulties of performing statistical inference in complex geometric spaces \cite{riemanngaussian}.
 
-While obtaining a point estimate from the posterior sample is crucial, it is important to recognize that the MCMC sample contains information about the entire posterior distribution. Tractable tree distributions \cite{ccd} try to capture the posterior distribution using a well-defined approximate distribution. This provides an elegant framework for testing alternative evolutionary hypotheses, determining whether a specific tree falls within a credible region, calculating statistics like information content \cite{informationcontent}, and analyzing dependencies between different parts of the tree (e.g., relationships between branch lengths and topological features). Existing methods that estimate distributions on the posterior sample for rooted trees focus on modeling tree topologies \cite{ccd,ccdlarget}, ignoring time information entirely. The family of Bayesian subsplit networks \cite{subsplit} has been extended to model branch lengths in multiple ways \cite{subsplitnf,subsplitbranchlengths}. However, Bayesian subsplit methods focus on direct variational inference, rather than posterior sample summarization.
+While obtaining a point estimate from the posterior sample is crucial, it is important to recognize that the MCMC sample contains information about the entire posterior distribution. Tractable tree distributions \cite{ccd} try to capture the posterior distribution using a well-defined approximate distribution. This provides an elegant framework for testing alternative evolutionary hypotheses, determining whether a specific tree falls within a credible region, calculating statistics like information content \cite{informationcontent}, and analyzing dependencies between different parts of the tree (e.g., relationships between branch lengths and topological features). Existing methods that estimate distributions on the posterior sample for rooted trees focus on modeling tree topologies \cite{ccd,ccdlarget}, ignoring time information entirely. The family of Bayesian subsplit networks \cite{subsplit} has been extended to model branch lengths in multiple ways \cite{subsplitnf,subsplitbranchlengths,artree}. However, Bayesian subsplit methods focus on direct variational inference, rather than posterior sample summarization.
 
 Here, we address the challenge of inferring tractable distributions on time trees, encompassing both topology and branch lengths. We compare different methods and tree embeddings, and demonstrate that the described methods exhibit significant differences in terms of capturing central tendencies and the tails of the distribution. Finally, we introduce a software package that enables researchers to fit and analyze these distributions, facilitating more nuanced insight into phylogenetic uncertainty. This tool allows for a more complete utilization of the information within the posterior tree sample, moving beyond simple point estimates.
 
@@ -303,7 +304,7 @@ There is another challenge that arises when designing a distribution on the heig
 
 In the following sections, we introduce three clade embeddings equipped with different strategies for assigning probabilities in the embedding space (see figures \ref{fig:example1} and \ref{fig:example2} for examples). Our general approach is to find the best approximation of the marginal time tree posterior distribution of the MCMC model. Thus, biological interpretation of the designed distributions is not a primary goal. Instead, we focus on a wide range of embeddings and distributions that fulfill the properties of tractable time tree distributions and then compare their fit with the MCMC posterior distribution on various real and simulated datasets.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \caption{This example shows the same time tree embedded into the different embedding spaces. We assign a value to every non-singleton clade. The second column (Absolute heights) contains the absolute vertex height. The third column (Last divergence) denotes the time since the last divergence for the root vertex and the length of the branch leading to a vertex for the internal vertices. The third embedding (Shorter branch) denotes the length of the branch leading to the older child. The last column (Shorter branch) represents the total tree height for the root clade and the ratio of the internal vertices to their parents.}
 	
 	\hspace{10pt}
@@ -341,7 +342,7 @@ In the following sections, we introduce three clade embeddings equipped with dif
 	\label{fig:example1}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 	\caption{A second example.}
 
 	\hspace{10pt}
@@ -487,7 +488,7 @@ There is a close connection to the \emph{rank-uniformity plots} used in Bayesian
 
 There are two differences between the rank-uniformity plots and the credible-set plots. First, while the rank-uniformity plots compare the true distribution with the posterior MCMC distribution, the credible-set plots compare the MCMC distribution with its approximation. Second, the rank-uniformity plots directly operate on univariate continuous parameters, whereas the credible-set plots transform each time tree into a univariate continuous space by computing its probability under the fitted model.
 
-For the simulated datasets, the true tree is known. Thus, we can use them to assess the accuracy of the point estimators. Note that we use the same point estimate for the topology (CCD0 MAP) for all the models, hence the only difference is the heights of the vertices. Furthermore, we can compare the point estimators to the current default method implemented in TreeAnnotator \cite{treeannotator}: for any given internal node corresponding to a clade $C$, the average height of the most common recent ancestor of $C$ in the posterior samples is used. We employ the following metric to calculate the distance between the true and estimated tree:
+For the simulated datasets, the true tree is known. Thus, we can use them to assess the accuracy of the point estimators. Note that we use the same point estimate for the topology (CCD1 MAP) for all the models, hence the only difference is the heights of the vertices. Furthermore, we can compare the point estimators to the current default method implemented in TreeAnnotator \cite{treeannotator}: for any given internal node corresponding to a clade $C$, the average height of the most common recent ancestor of $C$ in the posterior samples is used. We employ the following metric to calculate the distance between the true and estimated tree:
 
 $$
 SRBS\left(\{H^{(1)}_c\}_{c \in C(T_1)}, \{H^{(2)}_c\}_{c \in C(T_2)}\right) = \sum_{c \in C(T_1) \cap C(T_2)} \left(H^{(1)}_c-H^{(2)}_c\right)^2 .
@@ -500,11 +501,11 @@ Note that this is a modified version of the \emph{Squared Branch Score} \cite{tr
 
 \subsection*{Datasets}
 
-We conduct a comprehensive comparison of different distributions using both simulated and real datasets. For the simulated datasets, we used LPhyBEAST \cite{linguaphylo} to generate 100 trees corresponding sequence alignments under the Yule process with 100, 200 and 400 taxa respectively. Afterwards, we performed MCMC inference with BEAST 2 \cite{beast2} on each of the obtained 300 sequence alignments. We refer to the Supplementary Information for more details on the simulations.
+We conduct a comprehensive comparison of different distributions using both simulated and real-world datasets. For the simulated datasets, we used LPhyBEAST \cite{linguaphylo} to generate 100 trees corresponding sequence alignments under the Yule process with 100, 200 and 400 taxa respectively. Afterwards, we performed MCMC inference with BEAST 2 \cite{beast2} on each of the obtained 300 sequence alignments. We refer to the Supplementary Information for more details on the simulations.
 
 To assess the performance on real-world datasets, we obtained 44 posterior time tree distributions from Dryad \cite{dryad}. Specifically, we filtered the database for files with a \emph{.trees} extension and manually selected those containing a posterior sample of ultrametric time trees obtained using BEAST 2 or a similar software. An exhaustive list of the studies considered and potential reasons for exclusion are provided in the supporting information (see also table \ref{table-bio-datasets}). The datasets are part of a growing collection of phylogenetic posterior trees \cite{tree_dataset} curated to enable better method validation.
 
-\begin{table}[h!]
+\begin{table}[H]
 	\caption{Some statistics on the real-world datasets used in this study. The datasets were obtained from Dryad \cite{dryad} by filtering for files with a \emph{.trees} extension and manually selecting those containing a posterior sample of ultrametric time trees obtained by BEAST 2 or a similar software.}
 	\label{table-bio-datasets}
 
@@ -527,13 +528,46 @@ To assess the performance on real-world datasets, we obtained 44 posterior time 
 
 We now apply the presented methods on simulated and real datasets. We use CCD1 to model the topology. All results are on the held-out validation set except when explicitly stated otherwise.
 
+\subsection*{Effective sample size and entropy}
+
+Figure \ref{fig:effective-sample-size-entropy} shows how effective sample size and the entropy relate for the different datasets. One notable observation is that some of the real-world datasets have a high entropy of over 40 bits, combined with a low effective sample size below 1000 samples.
+
+\begin{figure}
+	\caption{The entropy and the effective sample size for the different datasets.}
+	
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-100-ccd1-entropy-ess.png}
+		\subcaption{Yule-100}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-entropy-ess.png}
+		\subcaption{Yule-200}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/yule-400-ccd1-entropy-ess.png}
+		\subcaption{Yule-400}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/bio-ccd1-entropy-ess.png}
+		\subcaption{Real-world datasets}
+	\end{subfigure}
+	
+	\label{fig:effective-sample-size-entropy}
+\end{figure}
+
 \subsection*{Data likelihood}
 
-The first metric we consider is the likelihood of the validation samples for each of the fitted Distributions. Because we downsample the MCMC trees to its effective sample size, we can assume that the samples are independent. The joint data likelihood is thus given by the product of the probability for each tree in the validation set.
+The first metric we consider to compare the different fitted distributions is the joint likelihood of the validation samples. Because we downsample the MCMC trees to their effective sample size, we can assume that the samples are independent. The joint data likelihood is thus given by the product of the probability for each tree in the validation set.
 
-Figure \ref{fig:data-likelihood} shows the distribution of the log data likelihoods for the different distributions and datasets. There is a clear pattern where the height ratio distributions have the highest likelihood, followed by the shortest branch and last divergence embeddings. This pattern is also visible when looking at the ranking of each method for every single MCMC sample in figure \ref{fig:data-likelihood-ranking}.
+Figure \ref{fig:data-likelihood} shows the distribution of the log data likelihoods for the different distributions and datasets. There is a clear pattern where the height ratio distributions have the highest likelihood, followed by the shortest branch and last divergence embeddings. This pattern is also visible when looking at the ranking of each method for every single MCMC sample in figure \ref{fig:data-likelihood-ranking}: these plots show for many datasets each distribution is at a specific rank when sorting the distributions by their log data likelihood.
 
-\begin{figure}[h!]
+\begin{figure}
 	\caption{The log data likelihoods for the different distributions and datasets. (The higher the better.)}
 	
 	\centering
@@ -562,8 +596,8 @@ Figure \ref{fig:data-likelihood} shows the distribution of the log data likeliho
 	\label{fig:data-likelihood}
 \end{figure}
 
-\begin{figure}[h!]
-	\caption{This figure shows how often a specific method ranks at a certain position when compared to the other methods. For example, the height ratio embedding with the beta distribution ranked first for almost all datasets. (The lower the rank the better.)}
+\begin{figure}
+	\caption{How often a specific method likelihood ranks at a certain position when compared to the other methods. For example, the height ratio embedding with the beta distribution ranked first for almost all datasets. (The lower the rank the better.)}
 	
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -593,9 +627,9 @@ Figure \ref{fig:data-likelihood} shows the distribution of the log data likeliho
 
 \subsection*{Goodness-of-fit}
 
-In order to assess the goodness-of-fit, we first look at the Cramér-von Mises criterion of the credible region plots. The smaller the criterion, the smaller the deviation to the $x=y$ line in the credible region plots. The smaller the deviation, the better the approximate distribution captures the smallest $\gamma$-credible regions for different values of $\gamma$. Figure \ref{fig:cramer-von-mises} shows the Cramér-von Mises criterion for the different distributions and datasets, while figure \ref{fig:cramer-von-mises-ranking} shows how often a specific method ranks at a certain position compared to the other methods. Interestingly, the ranking observed for the data likelihood is also apparant to some extent in the ranking of the Cramér-von Mises criterion for the real-world datasets. There, the height ratio embeddings generally perform best, while the shortest branch embedding and the last divergence embedding show no clear tendency. On the other hand, the Cramér-von Mises criterion for the simulated Yule datasets tell a different story, with the height ratio embedding generally showing the highest deviation to the $x=y$ line.
+To assess the goodness-of-fit, we first examine the Cramér-von Mises criterion of the credible-region plots. The smaller the criterion, the smaller the deviation to the $x=y$ line in the credible-region plots. The smaller the deviation, the better the approximate distribution captures the smallest $\gamma$-credible region for different values of $\gamma$. Figure \ref{fig:cramer-von-mises} shows the Cramér-von Mises criterion for the various distributions and datasets, while figure \ref{fig:cramer-von-mises-ranking} shows how often a specific method ranks at a particular position when compared to the other methods. Interestingly, the ranking observed for the data likelihood is also apparent in the ranking of the Cramér-von Mises criterion for the real-world datasets: The height ratio embeddings generally perform best, while the shortest branch embedding and the last divergence embedding shows no clear tendency. On the other hand, the Cramér-von Mises criterion for the simulated Yule datasets tells a different story, with the height ratio embedding generally showing the highest deviation to the $x=y$ line.
 
-\begin{figure}[h!]
+\begin{figure}
 	\caption{The Cramér-von Mises criterion for the different distributions and datasets. (The lower the better.)}
 	
 	\centering
@@ -624,8 +658,8 @@ In order to assess the goodness-of-fit, we first look at the Cramér-von Mises c
 	\label{fig:cramer-von-mises}
 \end{figure}
 
-\begin{figure}[h!]
-	\caption{This figure shows how often a specific method ranks at a certain position when its Cramér-von Mises criterion is compared to the other methods. For example, the height ratio embedding with the beta distribution ranked first for almost all datasets. (The lower the rank the better.)}
+\begin{figure}
+	\caption{How often a specific method ranks at a certain position when its Cramér-von Mises criterion is compared to the other methods. For example, the height ratio embedding with the beta distribution ranked first for almost all datasets. (The lower the rank the better.)}
 	
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -653,10 +687,10 @@ In order to assess the goodness-of-fit, we first look at the Cramér-von Mises c
 	\label{fig:cramer-von-mises-ranking}
 \end{figure}
 
-Figure \ref{fig:credible-regions} shows a selection of credible-regions plots for some datasets and distributions. Plots for all datasets and distributions can be found in the Supporting Information. The larger divergence for some datasets can partly be attributed to large entropy and a small sample size, particularily for tge real-world datasets. Whenever a clade split only appears in the validation samples but not in the training samples, the corresponding CCD1 probability of a tree with this clade will be $0$. These trees with probability $0$ are only contained in the smallest 100\%-credible region, leading to a smaller fraction than expected for all other credible regions. For some biological datasets, every single tree in the validation sample has probability $0$.
+Figure \ref{fig:credible-regions} shows a selection of credible-region plots for some datasets and distributions. Plots for all datasets and distributions can be found in the Supporting Information. The larger divergence for some biological datasets can partly be attributed to their large entropy and small ESS. Whenever a clade split only appears in the validation samples but not in the training samples, the corresponding CCD1 probability of a tree with this clade will be $0$. These trees with probability $0$ are only contained in the smallest 100\%-credible region, leading to a smaller fraction than expected for all other credible regions. For 11 out of the 49 real-world datasets, every single tree in the validation sample has a probability of $0$.
 
-\begin{figure}[h!]
-	\caption{This figure shows the credible-region plots for different datasets and distributions. The plot shows the fraction of MCMC trees contained in the smallest $\gamma$-credible region for different $\gamma$. The closer the resulting line is to the $x=y$ line the better. The blue line shows the median line for the datasets; 95 \% of all datasets fall into the blue region. The grey lines the credible region plots for 10 random datasets.}
+\begin{figure}
+	\caption{The credible-region plots for different datasets and distributions. The plot shows the fraction of MCMC trees contained in the smallest $\gamma$-credible region for different $\gamma$. The closer the resulting line is to the $x=y$ line the better. The blue line shows the median line for the datasets; 95 \% of all datasets fall into the blue region. The grey lines the credible-region plots for 10 random datasets.}
 	
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -664,29 +698,29 @@ Figure \ref{fig:credible-regions} shows a selection of credible-regions plots fo
 		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-credible-sets-Height (LogNormal), Ratios (Beta).png}
 		\subcaption{Height (LogNormal), Ratios (Beta) on Yule-200}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.45\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-credible-sets-Shortest Branch (Gamma).png}
 		\subcaption{Shortest Branch (Gamma) on Yule-200}
 	\end{subfigure}
 	
-	\begin{subfigure}[b]{0.45\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/yule-200-ccd1-credible-sets-Last Divergence (Gamma), Branches (Gamma).png}
 		\subcaption{Last Divergence (Gamma), Branches (Gamma) on Yule-200}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.45\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/bio-ccd1-credible-sets-Height (LogNormal), Ratios (Beta).png}
 		\subcaption{Height (LogNormal), Ratios (Beta) on real-world datasets}
 	\end{subfigure}
 
-	\begin{subfigure}[b]{0.45\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/bio-ccd1-credible-sets-Shortest Branch (Gamma).png}
 		\subcaption{Shortest Branch (Gamma) on real-world datasets}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.45\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/bio-ccd1-credible-sets-Last Divergence (Gamma), Branches (Gamma).png}
 		\subcaption{Last Divergence (Gamma), Branches (Gamma) on real-world datasets}
@@ -695,12 +729,11 @@ Figure \ref{fig:credible-regions} shows a selection of credible-regions plots fo
 	\label{fig:credible-regions}
 \end{figure}
 
-
 \subsection*{Accuracy of the point estimators}
 
-For the simulated datasets, the true tree is known. Thus, we can use them to assess the accuracy of the point estimators. Note that we use the same point estimate for the topology (CCD0 MAP) for all the models, hence the only difference is the heights of the vertices. Figure \ref{fig:accuracy-point-estimators} shows the distance to the true tree for the different distributions (and MRCA) and simulated datasets. Figure \ref{fig:accuracy-point-estimators-ranking} shows how often a specific method ranks at a certain position when compared to the other methods. It is apparant that none of the presented methods performs better than using MRCA for a majority of datasets. However, ignoring the last divergence embeddings, all methods produce point estimates of similar quality.
+For the simulated datasets, the true tree is known. Thus, we can use them to assess the accuracy of the point estimators. Note that we use the same point estimate for the topology (CCD1 MAP) for all the models, hence the only difference is the heights of the vertices. Figure \ref{fig:accuracy-point-estimators} displays the distance to the true tree for the different distributions (and MRCA) and simulated datasets. Figure \ref{fig:accuracy-point-estimators-ranking} shows how often a specific method ranks at a certain position when compared to the other methods. It is apparant that none of the presented methods performs better than MRCA for a majority of datasets. However, ignoring the last divergence embeddings, all methods produce point estimates of similar quality.
 
-\begin{figure}[h!]
+\begin{figure}
 	\caption{The log squared branch distance to the true tree for point estimates using the different distributions and datasets. (The lower the better.)}
 	
 	\centering
@@ -724,8 +757,8 @@ For the simulated datasets, the true tree is known. Thus, we can use them to ass
 	\label{fig:accuracy-point-estimators}
 \end{figure}
 
-\begin{figure}[h!]
-	\caption{How often each method ranked at a certain position when compared to the other methods. For example, MRCA ranked first for the majority of datasets. (The lower the rank the better.)}
+\begin{figure}
+	\caption{How often each method ranked at a certain position when its point estimate is compared to the other methods. For example, MRCA ranked first for the majority of datasets. (The lower the rank the better.)}
 	
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -750,7 +783,21 @@ For the simulated datasets, the true tree is known. Thus, we can use them to ass
 
 \section*{Discussion}
 
+We have introduced a family of tractable time tree distributions designed to approximate posterior distributions based on MCMC samples. These distributions allow us to perform operations relevant to Bayesian phylogenetics research in an efficient manner. Going beyond point estimation, they can be used to compare different evolutionary hypotheses, test if a tree is in the smallest 95\% credible region, or quantify the uncertainty of divergence times. All operations are accessible in a readily available software package \cite{juliapackage}. The package enables researchers to easily fit, select, and analyze these distributions using their own posterior samples.
+
+Experiments with both simulated and real-world datasets show that, generally, the height ratio embedding using the beta distribution produces the highest joint data likelihood. Furthermore, it provides the best approximation of the credible regions for the real-world dataset and produces the best point estimates (although MRCA outperforms all distribution-based point estimators). The only shortcoming of the height ratio embedding is that it does not capture the credible regions of the simulated datasets as well as the alternatives. (Why is that?). The results for the shortest branch embeddings are comparable with those of the height ratio embedding regarding the joint data likelihood and the accuracy of the point estimates. Furthermore, they outperform the other embeddings in capturing the smallest credible regions on the simulated datasets. Distributions based on the last divergence embedding generally fall short in terms of the joint data likelihood and the accuracy of the point estimates. They perform similarly to the shortest branch embedding regarding the smallest credible regions.
+
+Because of these mixed results, we advocate for a model selection approach. Researchers can employ likelihood-based model selection to determine the most suitable distribution for their specific dataset. In a second step, credible-region plots can be used to assess whether the credible sets are well-captured and if the approximate distribution can reliably be used to gain insight into the posterior distribution. This workflow is facilitated by the Julia package using a single bash command. In case only a point estimate is needed, the results suggest resorting to the default method implemented in TreeAnnotator \cite{treeannotator}: MRCA still outperforms the distribution-based point estimators.
+
+All discussed distributions are based on basic embedding transformations, on well-known univariate distributions, and assume independence in the embedding space. While these choices offer simplicity and tractability, more sophisticated approaches might better capture intricate dependencies within the vertex heights. One such approach is to leverage neural networks to learn embeddings directly from data. In particular, normalizing flows \cite{normalizingflow} and graph neural networks \cite{graphnn} have proven effective in the context of Bayesian subsplit networks \cite{subsplitnf,artree}.
+
+We focus on modeling distributions on a clade level. Another promising approach is to model the distances between taxa, corresponding to their evolutionary distance. Several different tree spaces around this concept have been proposed, including the wald space \cite{wald}, the palm tree space \cite{tropical}, and the cube space \cite{cube}. However, the inherent constraints of these spaces introduce significant challenges, particularly regarding the normalization of the probability density. Things get easier if one drops the requirement of calculating the unnormalized posterior. One exciting possibility is to define a probability measure based on the distance metric defined in these spaces. Given the distance metric $d(T_1, T_2)$, a possible probability measure could be inspired by the normal distribution and resemble $p(T) \sim \exp\left(d(T, \hat{T}) / \sigma^2\right)$ with the Fréchet mean $\hat{T}$ \cite{frechetmeanvar}. Given that the Wald space is equipped with a geometry of globally nonpositive curvature, the maximum likelihood estimators in that space are well-defined \cite{gaussianriemann} (but not necessarily tractable). Another benefit of distance-based approaches is that they jointly model topology and branch lengths instead of treating them independently.
+
+We defined our time tree distributions in the context of approximating the posterior as given by MCMC. However, another possibility is to use them for direct variational inference. The simplicity of these distributions makes them well-suited for this purpose, as their tractability allows for an effective variational approximation.
+
 \section*{Conclusion}
+
+This paper introduced tractable time tree distributions for summarizing MCMC posterior samples in Bayesian phylogenetics, enabling analyses beyond point estimates. We compared different embeddings and distributions on simulated and real-world datasets, finding that height ratio embeddings with beta distributions generally outperformed the alternatives. Because the results are dataset-dependent, we recommend model selection for optimal distribution choice. The accompanying software package facilitates researchers to fit and analyze these distributions using their own posterior samples. Future work could explore neural network embeddings and distance-based tree space approaches.
 
 \section*{Supporting information}
 
@@ -762,7 +809,7 @@ A Julia package \cite{juliapackage} was developed implementing all the methods p
 
 This section examines the susceptibility of time trees to the \emph{curse of dimensionality} \cite{curse,curse2}, a phenomenon where the complexity of a problem increases exponentially with the number of dimensions. Specifically, we look at the pairwise Robinson–Foulds (RF) distances between the MCMC trees of the synthetic Yule datasets. We find that the distances increase with the number of taxa while the relative variation of the distances decreases (see figures \ref{fig:curse1} and \ref{fig:curse2}). This defies the intuition that regions of higher probability density should yield samples with closer proximity and might complicate the application of conventional distance-based methods to analyze the posterior sample. Previous work suggests that the curse of dimensionality might not be limited to simulated trees. The datasets analyzed by \cite{dimensionality} show a median intrinsic dimensionality of around $7$ when using the RF distance---potentially high enough to degrade the performance of distance-based methods \cite{curseimplications}.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \begin{minipage}[t]{0.45\textwidth}
         \caption{The average pairwise Robinson–Foulds distance between the MCMC trees of the synthetic Yule datasets. The distances increase with the number of taxa.}
@@ -784,6 +831,10 @@ This section examines the susceptibility of time trees to the \emph{curse of dim
 \end{figure}
 
 \subsection*{Correlations}
+
+% TODO
+
+TODO
 
 \subsection*{Tree ESS}
 
